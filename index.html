@@ -2,102 +2,254 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Comparador de Horarios</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f2f2;
       margin: 0;
       padding: 2rem;
-      background: #f2f2f2;
       color: #333;
     }
-    h1 {
-      text-align: center;
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
     }
-    .author {
-      position: absolute;
-      top: 10px;
-      right: 20px;
+    .autor {
       font-size: 0.9rem;
       font-style: italic;
+      color: #555;
+    }
+    select, input, button {
+      font-size: 1rem;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      width: 100%;
+      max-width: 300px;
+      box-sizing: border-box;
+    }
+    h1 {
+      margin-bottom: 0.2rem;
+      text-align: center;
+    }
+    h2 {
+      text-align: center;
+      font-weight: normal;
       color: #666;
+      margin-top: 0;
+      margin-bottom: 2rem;
     }
     .container {
-      max-width: 800px;
-      margin: auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 360px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
-    label, select, input {
-      display: block;
-      margin-bottom: 1rem;
-      width: 100%;
-    }
-    .result {
-      margin-top: 1rem;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-    iframe {
-      margin-top: 2rem;
-      width: 100%;
-      height: 500px;
+    button {
+      background-color: #007acc;
+      color: white;
       border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+    .clocks {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2rem;
+    }
+    .clock {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      width: 45%;
+      text-align: center;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .clock h3 {
+      margin-bottom: 0.5rem;
+      font-weight: normal;
+      color: #007acc;
+    }
+    .time-display {
+      font-size: 2.5rem;
+      font-weight: bold;
+      font-family: monospace;
+    }
+    #language-select {
+      font-size: 1rem;
+      padding: 0.3rem 0.5rem;
     }
   </style>
 </head>
 <body>
-  <div class="author">Autoría: Jésica Favara</div>
+  <header>
+    <div class="autor">Autoría: Jésica Favara</div>
+    <div>
+      <label for="language-select" style="margin-right: 0.5rem;">🌐</label>
+      <select id="language-select" aria-label="Seleccionar idioma">
+        <option value="es" selected>Español</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </header>
+
+  <h1 id="main-title">Comparador de Horarios</h1>
+  <h2 id="subtitle">Usá el conversor para revisar el horario de tu ciudad</h2>
+
   <div class="container">
-    <h1>Comparador de Horarios</h1>
-    <label for="localTime">Seleccioná tu hora local:</label>
-    <input type="datetime-local" id="localTime">
+    <label id="label-origin" for="origin-city">Ciudad de origen (UTC):</label>
+    <select id="origin-city"></select>
 
-    <label for="city">Elegí una ciudad para comparar:</label>
-    <select id="city">
-      <option value="-3">Buenos Aires (UTC-3)</option>
-      <option value="1">Madrid (UTC+1)</option>
-      <option value="0">Londres (UTC+0)</option>
-      <option value="-5">Nueva York (UTC-5)</option>
-      <option value="9">Tokio (UTC+9)</option>
-      <option value="10">Sídney (UTC+10)</option>
-      <option value="-8">Los Ángeles (UTC-8)</option>
-      <option value="5.5">Nueva Delhi (UTC+5:30)</option>
-      <option value="3">Moscú (UTC+3)</option>
-      <option value="2">El Cairo (UTC+2)</option>
-      <option value="-4">Santiago de Chile (UTC-4)</option>
-      <option value="-3">Montevideo (UTC-3)</option>
-      <option value="8">Beijing (UTC+8)</option>
-      <option value="7">Bangkok (UTC+7)</option>
-    </select>
+    <label id="label-time" for="input-time">Hora en ciudad de origen:</label>
+    <input type="time" id="input-time" value="12:00" />
 
-    <div class="result" id="result"></div>
+    <label id="label-destination" for="destination-city">Ciudad destino (UTC):</label>
+    <select id="destination-city"></select>
 
-    <iframe src="https://upload.wikimedia.org/wikipedia/commons/8/88/Standard_World_Time_Zones.png"></iframe>
+    <button id="convert-btn">Convertir</button>
+  </div>
+
+  <div class="clocks">
+    <div class="clock">
+      <h3 id="label-origin-clock">Hora en ciudad de origen</h3>
+      <div id="origin-clock" class="time-display">--:--</div>
+    </div>
+    <div class="clock">
+      <h3 id="label-destination-clock">Hora en ciudad destino</h3>
+      <div id="destination-clock" class="time-display">--:--</div>
+    </div>
   </div>
 
   <script>
-    const localTimeInput = document.getElementById('localTime');
-    const citySelect = document.getElementById('city');
-    const resultDiv = document.getElementById('result');
+    const translations = {
+      es: {
+        mainTitle: "Comparador de Horarios",
+        subtitle: "Usá el conversor para revisar el horario de tu ciudad",
+        originCity: "Ciudad de origen (UTC):",
+        timeLabel: "Hora en ciudad de origen:",
+        destinationCity: "Ciudad destino (UTC):",
+        convertButton: "Convertir",
+        originClock: "Hora en ciudad de origen",
+        destinationClock: "Hora en ciudad destino",
+        cities: [
+          {name: "Buenos Aires", offset: -3},
+          {name: "Nueva York", offset: -4},
+          {name: "Ciudad de México", offset: -6},
+          {name: "Londres", offset: 1},
+          {name: "Madrid", offset: 2},
+          {name: "Tokio", offset: 9},
+          {name: "Sídney", offset: 10},
+          {name: "París", offset: 2},
+          {name: "Moscú", offset: 3},
+          {name: "Los Ángeles", offset: -7},
+          {name: "El Cairo", offset: 2},
+          {name: "Delhi", offset: 5.5}
+        ]
+      },
+      en: {
+        mainTitle: "Time Zone Converter",
+        subtitle: "Use the converter to check your city’s time",
+        originCity: "Origin city (UTC):",
+        timeLabel: "Time in origin city:",
+        destinationCity: "Destination city (UTC):",
+        convertButton: "Convert",
+        originClock: "Time in origin city",
+        destinationClock: "Time in destination city",
+        cities: [
+          {name: "Buenos Aires", offset: -3},
+          {name: "New York", offset: -4},
+          {name: "Mexico City", offset: -6},
+          {name: "London", offset: 1},
+          {name: "Madrid", offset: 2},
+          {name: "Tokyo", offset: 9},
+          {name: "Sydney", offset: 10},
+          {name: "Paris", offset: 2},
+          {name: "Moscow", offset: 3},
+          {name: "Los Angeles", offset: -7},
+          {name: "Cairo", offset: 2},
+          {name: "Delhi", offset: 5.5}
+        ]
+      }
+    };
 
-    function updateComparison() {
-      const localTime = new Date(localTimeInput.value);
-      if (isNaN(localTime)) return;
+    const langSelect = document.getElementById("language-select");
+    const originCitySelect = document.getElementById("origin-city");
+    const destinationCitySelect = document.getElementById("destination-city");
+    const inputTime = document.getElementById("input-time");
+    const convertBtn = document.getElementById("convert-btn");
 
-      const localOffset = -new Date().getTimezoneOffset() / 60;
-      const selectedOffset = parseFloat(citySelect.value);
-      const diff = selectedOffset - localOffset;
-
-      const comparedTime = new Date(localTime.getTime() + diff * 60 * 60 * 1000);
-      resultDiv.textContent = `En la ciudad seleccionada serán las ${comparedTime.toLocaleTimeString()} del ${comparedTime.toLocaleDateString()}.`;
+    function populateCities(lang) {
+      const cities = translations[lang].cities;
+      originCitySelect.innerHTML = "";
+      destinationCitySelect.innerHTML = "";
+      cities.forEach(city => {
+        const text = `${city.name} (UTC${city.offset >= 0 ? "+" : ""}${city.offset})`;
+        originCitySelect.add(new Option(text, city.offset));
+        destinationCitySelect.add(new Option(text, city.offset));
+      });
+      // Default selections
+      originCitySelect.selectedIndex = 0;
+      destinationCitySelect.selectedIndex = 1;
     }
 
-    localTimeInput.addEventListener('input', updateComparison);
-    citySelect.addEventListener('change', updateComparison);
+    function updateTexts(lang) {
+      document.getElementById("main-title").textContent = translations[lang].mainTitle;
+      document.getElementById("subtitle").textContent = translations[lang].subtitle;
+      document.getElementById("label-origin").textContent = translations[lang].originCity;
+      document.getElementById("label-time").textContent = translations[lang].timeLabel;
+      document.getElementById("label-destination").textContent = translations[lang].destinationCity;
+      convertBtn.textContent = translations[lang].convertButton;
+      document.getElementById("label-origin-clock").textContent = translations[lang].originClock;
+      document.getElementById("label-destination-clock").textContent = translations[lang].destinationClock;
+    }
+
+    function pad(num) {
+      return num.toString().padStart(2, "0");
+    }
+
+    function convertTime() {
+      const originOffset = parseFloat(originCitySelect.value);
+      const destOffset = parseFloat(destinationCitySelect.value);
+      const [hours, minutes] = inputTime.value.split(":").map(Number);
+
+      // Mostrar reloj origen (hora que puso el usuario)
+      const originTimeStr = `${pad(hours)}:${pad(minutes)}`;
+      document.getElementById("origin-clock").textContent = originTimeStr;
+
+      // Calcular hora destino sumando diferencias de UTC
+      let destHours = hours + (destOffset - originOffset);
+      let destMinutes = minutes;
+
+      // Ajustar horas para formato 24h (0-23)
+      if (destHours < 0) destHours += 24;
+      if (destHours >= 24) destHours -= 24;
+
+      const destTimeStr = `${pad(destHours)}:${pad(destMinutes)}`;
+      document.getElementById("destination-clock").textContent = destTimeStr;
+    }
+
+    langSelect.addEventListener("change", () => {
+      const lang = langSelect.value;
+      updateTexts(lang);
+      populateCities(lang);
+      convertTime();
+    });
+
+    convertBtn.addEventListener("click", convertTime);
+
+    // Inicializar
+    const defaultLang = "es";
+    updateTexts(defaultLang);
+    populateCities(defaultLang);
+    convertTime();
   </script>
 </body>
 </html>
