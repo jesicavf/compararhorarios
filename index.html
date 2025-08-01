@@ -1,3 +1,4 @@
+<!-- Guarda esto como index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -143,15 +144,23 @@
           {name: "Buenos Aires", offset: -3},
           {name: "Nueva York", offset: -4},
           {name: "Ciudad de México", offset: -6},
+          {name: "Miami", offset: -4},
+          {name: "Chicago", offset: -5},
+          {name: "Los Ángeles", offset: -7},
+          {name: "San Francisco", offset: -7},
+          {name: "Toronto", offset: -4},
+          {name: "Vancouver", offset: -7},
           {name: "Londres", offset: 1},
           {name: "Madrid", offset: 2},
-          {name: "Tokio", offset: 9},
-          {name: "Sídney", offset: 10},
           {name: "París", offset: 2},
           {name: "Moscú", offset: 3},
-          {name: "Los Ángeles", offset: -7},
-          {name: "El Cairo", offset: 2},
-          {name: "Delhi", offset: 5.5}
+          {name: "Dubai", offset: 4},
+          {name: "Delhi", offset: 5.5},
+          {name: "Seúl", offset: 9},
+          {name: "Tokio", offset: 9},
+          {name: "Perth", offset: 8},
+          {name: "Sídney", offset: 10},
+          {name: "Johannesburgo", offset: 2}
         ]
       },
       en: {
@@ -167,15 +176,23 @@
           {name: "Buenos Aires", offset: -3},
           {name: "New York", offset: -4},
           {name: "Mexico City", offset: -6},
+          {name: "Miami", offset: -4},
+          {name: "Chicago", offset: -5},
+          {name: "Los Angeles", offset: -7},
+          {name: "San Francisco", offset: -7},
+          {name: "Toronto", offset: -4},
+          {name: "Vancouver", offset: -7},
           {name: "London", offset: 1},
           {name: "Madrid", offset: 2},
-          {name: "Tokyo", offset: 9},
-          {name: "Sydney", offset: 10},
           {name: "Paris", offset: 2},
           {name: "Moscow", offset: 3},
-          {name: "Los Angeles", offset: -7},
-          {name: "Cairo", offset: 2},
-          {name: "Delhi", offset: 5.5}
+          {name: "Dubai", offset: 4},
+          {name: "Delhi", offset: 5.5},
+          {name: "Seoul", offset: 9},
+          {name: "Tokyo", offset: 9},
+          {name: "Perth", offset: 8},
+          {name: "Sydney", offset: 10},
+          {name: "Johannesburg", offset: 2}
         ]
       }
     };
@@ -195,20 +212,20 @@
         originCitySelect.add(new Option(text, city.offset));
         destinationCitySelect.add(new Option(text, city.offset));
       });
-      // Default selections
       originCitySelect.selectedIndex = 0;
       destinationCitySelect.selectedIndex = 1;
     }
 
     function updateTexts(lang) {
-      document.getElementById("main-title").textContent = translations[lang].mainTitle;
-      document.getElementById("subtitle").textContent = translations[lang].subtitle;
-      document.getElementById("label-origin").textContent = translations[lang].originCity;
-      document.getElementById("label-time").textContent = translations[lang].timeLabel;
-      document.getElementById("label-destination").textContent = translations[lang].destinationCity;
-      convertBtn.textContent = translations[lang].convertButton;
-      document.getElementById("label-origin-clock").textContent = translations[lang].originClock;
-      document.getElementById("label-destination-clock").textContent = translations[lang].destinationClock;
+      const t = translations[lang];
+      document.getElementById("main-title").textContent = t.mainTitle;
+      document.getElementById("subtitle").textContent = t.subtitle;
+      document.getElementById("label-origin").textContent = t.originCity;
+      document.getElementById("label-time").textContent = t.timeLabel;
+      document.getElementById("label-destination").textContent = t.destinationCity;
+      convertBtn.textContent = t.convertButton;
+      document.getElementById("label-origin-clock").textContent = t.originClock;
+      document.getElementById("label-destination-clock").textContent = t.destinationClock;
     }
 
     function pad(num) {
@@ -220,15 +237,12 @@
       const destOffset = parseFloat(destinationCitySelect.value);
       const [hours, minutes] = inputTime.value.split(":").map(Number);
 
-      // Mostrar reloj origen (hora que puso el usuario)
       const originTimeStr = `${pad(hours)}:${pad(minutes)}`;
       document.getElementById("origin-clock").textContent = originTimeStr;
 
-      // Calcular hora destino sumando diferencias de UTC
       let destHours = hours + (destOffset - originOffset);
       let destMinutes = minutes;
 
-      // Ajustar horas para formato 24h (0-23)
       if (destHours < 0) destHours += 24;
       if (destHours >= 24) destHours -= 24;
 
@@ -245,7 +259,6 @@
 
     convertBtn.addEventListener("click", convertTime);
 
-    // Inicializar
     const defaultLang = "es";
     updateTexts(defaultLang);
     populateCities(defaultLang);
