@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Comparador de husos horarios</title>
+</head>
+<body>
+  <h1>Comparador de horarios entre zonas</h1>
+  <label for="origen">Ciudad de origen:</label>
+  <input type="text" id="origen" placeholder="Ej. Buenos Aires"><br><br>
+  
+  <label for="hora">Hora local (HH:MM):</label>
+  <input type="time" id="hora"><br><br>
+  
+  <label for="destino">Ciudad destino:</label>
+  <input type="text" id="destino" placeholder="Ej. Madrid"><br><br>
+  
+  <button onclick="comparar()">Comparar</button>
+  
+  <h2 id="resultado"></h2>
+
+  <script>
+    async function comparar() {
+      const origen = document.getElementById('origen').value;
+      const destino = document.getElementById('destino').value;
+      const hora = document.getElementById('hora').value;
+
+      const zonasDisponibles = await fetch(`https://worldtimeapi.org/api/timezone`).then(r => r.json());
+      const zonasOrigen = zonasDisponibles.filter(z => z.toLowerCase().includes(origen.toLowerCase()));
+      const zonasDestino = zonasDisponibles.filter(z => z.toLowerCase().includes(destino.toLowerCase()));
+
+      if (!zonasOrigen.length || !zonasDestino.length) {
+        document.getElementById('resultado').innerText = "No se encontraron ciudades coincidentes.";
+        return;
+      }
+
+      const nowOrigen = await fetch(`https://worldtimeapi.org/api/timezone/${zonasOrigen[0]}`).then(r => r.json());
+      const nowDestino = await fetch(`https://worldtimeapi.org/api/timezone/${zonasDestino[0]}`).then(r => r.json());
+
+      const offsetOrigen = nowOrigen.utc_offset;
+      const offsetDestino = nowDestino.utc_offset;
+
+      const horaOriginal = new Date(`1970-01-01T${hora}:00${offsetOrigen}`);
+      const diferencia = (parseInt(offsetDestino.slice(1, 3)) - parseInt(offsetOrigen.slice(1, 3))) * 60 +
+                         (parseInt(offsetDestino.slice(4, 6)) - parseInt(offsetOrigen.slice(4, 6)));
+
+      const nuevaHora = new Date(horaOriginal.getTime() + diferencia * 60000);
+      const horas = nuevaHora.getHours().toString().padStart(2, '0');
+      const minutos = nuevaHora.getMinutes().toString().padStart(2, '0');
+
+      document.getElementById('resultado').innerText = `En ${destino}, será las ${horas}:${minutos}`;
+    }
+  </script>
+</body>
+</html>
