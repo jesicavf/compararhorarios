@@ -63,26 +63,35 @@
     }
     .clocks {
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
+      flex-wrap: wrap;
       margin-top: 2rem;
+      gap: 1rem;
     }
     .clock {
       background: white;
-      padding: 1rem;
+      padding: 0.8rem;
       border-radius: 8px;
-      width: 45%;
+      width: 130px;
       text-align: center;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      flex: 1 1 120px;
     }
     .clock h3 {
       margin-bottom: 0.5rem;
       font-weight: normal;
       color: #007acc;
+      font-size: 0.95rem;
     }
     .time-display {
-      font-size: 2.5rem;
+      font-size: 1.8rem;
       font-weight: bold;
       font-family: monospace;
+    }
+    .day-info {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 0.3rem;
     }
     #language-select {
       font-size: 1rem;
@@ -120,12 +129,14 @@
 
   <div class="clocks">
     <div class="clock">
-      <h3 id="label-origin-clock">Hora en ciudad de origen</h3>
+      <h3 id="label-origin-clock">Ciudad de origen</h3>
       <div id="origin-clock" class="time-display">--:--</div>
+      <div id="origin-day" class="day-info"></div>
     </div>
     <div class="clock">
-      <h3 id="label-destination-clock">Hora en ciudad destino</h3>
+      <h3 id="label-destination-clock">Ciudad destino</h3>
       <div id="destination-clock" class="time-display">--:--</div>
+      <div id="destination-day" class="day-info"></div>
     </div>
   </div>
 
@@ -138,14 +149,16 @@
         timeLabel: "Hora en ciudad de origen:",
         destinationCity: "Ciudad destino (UTC):",
         convertButton: "Convertir",
-        originClock: "Hora en ciudad de origen",
-        destinationClock: "Hora en ciudad destino",
+        sameDay: "Mismo día",
+        nextDay: "Día siguiente",
+        prevDay: "Día anterior",
         cities: [
           {name: "Buenos Aires", offset: -3},
           {name: "Nueva York", offset: -4},
           {name: "Ciudad de México", offset: -6},
           {name: "Miami", offset: -4},
           {name: "Chicago", offset: -5},
+          {name: "Houston", offset: -5},
           {name: "Los Ángeles", offset: -7},
           {name: "San Francisco", offset: -7},
           {name: "Toronto", offset: -4},
@@ -170,14 +183,16 @@
         timeLabel: "Time in origin city:",
         destinationCity: "Destination city (UTC):",
         convertButton: "Convert",
-        originClock: "Time in origin city",
-        destinationClock: "Time in destination city",
+        sameDay: "Same day",
+        nextDay: "Next day",
+        prevDay: "Previous day",
         cities: [
           {name: "Buenos Aires", offset: -3},
           {name: "New York", offset: -4},
           {name: "Mexico City", offset: -6},
           {name: "Miami", offset: -4},
           {name: "Chicago", offset: -5},
+          {name: "Houston", offset: -5},
           {name: "Los Angeles", offset: -7},
           {name: "San Francisco", offset: -7},
           {name: "Toronto", offset: -4},
@@ -204,7 +219,8 @@
     const convertBtn = document.getElementById("convert-btn");
 
     function populateCities(lang) {
-      const cities = translations[lang].cities;
+      const cities = [...translations[lang].cities];
+      cities.sort((a, b) => a.offset - b.offset);
       originCitySelect.innerHTML = "";
       destinationCitySelect.innerHTML = "";
       cities.forEach(city => {
@@ -224,8 +240,6 @@
       document.getElementById("label-time").textContent = t.timeLabel;
       document.getElementById("label-destination").textContent = t.destinationCity;
       convertBtn.textContent = t.convertButton;
-      document.getElementById("label-origin-clock").textContent = t.originClock;
-      document.getElementById("label-destination-clock").textContent = t.destinationClock;
     }
 
     function pad(num) {
@@ -233,21 +247,45 @@
     }
 
     function convertTime() {
+      const lang = langSelect.value;
+      const t = translations[lang];
       const originOffset = parseFloat(originCitySelect.value);
       const destOffset = parseFloat(destinationCitySelect.value);
+      const originCityName = originCitySelect.options[originCitySelect.selectedIndex].text.split(" (")[0];
+      const destCityName = destinationCitySelect.options[destinationCitySelect.selectedIndex].text.split(" (")[0];
+
+      // Cambiar títulos dinámicamente con nombre de ciudad
+      document.getElementById("label-origin-clock").textContent = originCityName;
+      document.getElementById("label-destination-clock").textContent = destCityName;
+
       const [hours, minutes] = inputTime.value.split(":").map(Number);
 
-      const originTimeStr = `${pad(hours)}:${pad(minutes)}`;
-      document.getElementById("origin-clock").textContent = originTimeStr;
+      document.getElementById("origin-clock").textContent = `${pad(hours)}:${pad(minutes)}`;
+      document.getElementById("origin-day").textContent = t.sameDay;
 
-      let destHours = hours + (destOffset - originOffset);
-      let destMinutes = minutes;
+      let totalMinutes = hours * 60 + minutes + (destOffset - originOffset) * 60;
+      let dayShift = 0;
 
-      if (destHours < 0) destHours += 24;
-      if (destHours >= 24) destHours -= 24;
+      if (totalMinutes < 0) {
+        totalMinutes += 1440;
+        dayShift = -1;
+      } else if (totalMinutes >= 1440) {
+        totalMinutes -= 1440;
+        dayShift = 1;
+      }
 
-      const destTimeStr = `${pad(destHours)}:${pad(destMinutes)}`;
-      document.getElementById("destination-clock").textContent = destTimeStr;
+      const destHours = Math.floor(totalMinutes / 60);
+      const destMinutes = Math.round(totalMinutes % 60);
+
+      document.getElementById("destination-clock").textContent = `${pad(destHours)}:${pad(destMinutes)}`;
+
+      if (dayShift === 0) {
+        document.getElementById("destination-day").textContent = t.sameDay;
+      } else if (dayShift === 1) {
+        document.getElementById("destination-day").textContent = t.nextDay;
+      } else {
+        document.getElementById("destination-day").textContent = t.prevDay;
+      }
     }
 
     langSelect.addEventListener("change", () => {
@@ -257,6 +295,8 @@
       convertTime();
     });
 
+    originCitySelect.addEventListener("change", convertTime);
+    destinationCitySelect.addEventListener("change", convertTime);
     convertBtn.addEventListener("click", convertTime);
 
     const defaultLang = "es";
