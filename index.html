@@ -166,6 +166,7 @@
           {name: "Londres", offset: 1},
           {name: "Madrid", offset: 2},
           {name: "París", offset: 2},
+          {name: "Budapest", offset: 2},
           {name: "Moscú", offset: 3},
           {name: "Dubai", offset: 4},
           {name: "Delhi", offset: 5.5},
@@ -200,6 +201,7 @@
           {name: "London", offset: 1},
           {name: "Madrid", offset: 2},
           {name: "Paris", offset: 2},
+          {name: "Budapest", offset: 2},
           {name: "Moscow", offset: 3},
           {name: "Dubai", offset: 4},
           {name: "Delhi", offset: 5.5},
@@ -254,7 +256,6 @@
       const originCityName = originCitySelect.options[originCitySelect.selectedIndex].text.split(" (")[0];
       const destCityName = destinationCitySelect.options[destinationCitySelect.selectedIndex].text.split(" (")[0];
 
-      // Cambiar títulos dinámicamente con nombre de ciudad
       document.getElementById("label-origin-clock").textContent = originCityName;
       document.getElementById("label-destination-clock").textContent = destCityName;
 
