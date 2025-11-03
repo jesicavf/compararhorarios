@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Comparador de Horarios</title>
+  <title>Comparador de Horarios Automático</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -93,10 +93,6 @@
       color: #777;
       margin-top: 0.3rem;
     }
-    #language-select {
-      font-size: 1rem;
-      padding: 0.3rem 0.5rem;
-    }
   </style>
 </head>
 <body>
@@ -115,13 +111,13 @@
   <h2 id="subtitle">Usá el conversor para revisar el horario de tu ciudad</h2>
 
   <div class="container">
-    <label id="label-origin" for="origin-city">Ciudad de origen (UTC):</label>
+    <label id="label-origin" for="origin-city">Ciudad de origen:</label>
     <select id="origin-city"></select>
 
     <label id="label-time" for="input-time">Hora en ciudad de origen:</label>
     <input type="time" id="input-time" value="12:00" />
 
-    <label id="label-destination" for="destination-city">Ciudad destino (UTC):</label>
+    <label id="label-destination" for="destination-city">Ciudad destino:</label>
     <select id="destination-city"></select>
 
     <button id="convert-btn">Convertir</button>
@@ -141,172 +137,83 @@
   </div>
 
   <script>
-    const translations = {
-      es: {
-        mainTitle: "Comparador de Horarios",
-        subtitle: "Usá el conversor para revisar el horario de tu ciudad",
-        originCity: "Ciudad de origen (UTC):",
-        timeLabel: "Hora en ciudad de origen:",
-        destinationCity: "Ciudad destino (UTC):",
-        convertButton: "Convertir",
-        sameDay: "Mismo día",
-        nextDay: "Día siguiente",
-        prevDay: "Día anterior",
-        cities: [
-          {name: "California", offset: -7},
-          {name: "Los Ángeles", offset: -7},
-          {name: "San Francisco", offset: -7},
-          {name: "Vancouver", offset: -7},
-          {name: "Chicago", offset: -5},
-          {name: "Houston", offset: -5},
-          {name: "Nueva York", offset: -4},
-          {name: "Miami", offset: -4},
-          {name: "Toronto", offset: -4},
-          {name: "Ciudad de México", offset: -6},
-          {name: "Buenos Aires", offset: -3},
-          {name: "Londres", offset: 1},
-          {name: "Madrid", offset: 2},
-          {name: "París", offset: 2},
-          {name: "Roma", offset: 2},
-          {name: "Budapest", offset: 2},
-          {name: "Johannesburgo", offset: 2},
-          {name: "Moscú", offset: 3},
-          {name: "Dubai", offset: 4},
-          {name: "Delhi", offset: 5.5},
-          {name: "Perth", offset: 8},
-          {name: "Seúl", offset: 9},
-          {name: "Tokio", offset: 9},
-          {name: "Sídney", offset: 10}
-        ]
-      },
-      en: {
-        mainTitle: "Time Zone Converter",
-        subtitle: "Use the converter to check your city’s time",
-        originCity: "Origin city (UTC):",
-        timeLabel: "Time in origin city:",
-        destinationCity: "Destination city (UTC):",
-        convertButton: "Convert",
-        sameDay: "Same day",
-        nextDay: "Next day",
-        prevDay: "Previous day",
-        cities: [
-          {name: "California", offset: -7},
-          {name: "Los Angeles", offset: -7},
-          {name: "San Francisco", offset: -7},
-          {name: "Vancouver", offset: -7},
-          {name: "Chicago", offset: -5},
-          {name: "Houston", offset: -5},
-          {name: "New York", offset: -4},
-          {name: "Miami", offset: -4},
-          {name: "Toronto", offset: -4},
-          {name: "Mexico City", offset: -6},
-          {name: "Buenos Aires", offset: -3},
-          {name: "London", offset: 1},
-          {name: "Madrid", offset: 2},
-          {name: "Paris", offset: 2},
-          {name: "Rome", offset: 2},
-          {name: "Budapest", offset: 2},
-          {name: "Johannesburg", offset: 2},
-          {name: "Moscow", offset: 3},
-          {name: "Dubai", offset: 4},
-          {name: "Delhi", offset: 5.5},
-          {name: "Perth", offset: 8},
-          {name: "Seoul", offset: 9},
-          {name: "Tokyo", offset: 9},
-          {name: "Sydney", offset: 10}
-        ]
-      }
-    };
+    const cityZones = [
+      { nameEs: "Buenos Aires", nameEn: "Buenos Aires", zone: "America/Argentina/Buenos_Aires" },
+      { nameEs: "Nueva York", nameEn: "New York", zone: "America/New_York" },
+      { nameEs: "Miami", nameEn: "Miami", zone: "America/New_York" },
+      { nameEs: "Los Ángeles", nameEn: "Los Angeles", zone: "America/Los_Angeles" },
+      { nameEs: "San Francisco", nameEn: "San Francisco", zone: "America/Los_Angeles" },
+      { nameEs: "Chicago", nameEn: "Chicago", zone: "America/Chicago" },
+      { nameEs: "Ciudad de México", nameEn: "Mexico City", zone: "America/Mexico_City" },
+      { nameEs: "Toronto", nameEn: "Toronto", zone: "America/Toronto" },
+      { nameEs: "Madrid", nameEn: "Madrid", zone: "Europe/Madrid" },
+      { nameEs: "Londres", nameEn: "London", zone: "Europe/London" },
+      { nameEs: "París", nameEn: "Paris", zone: "Europe/Paris" },
+      { nameEs: "Roma", nameEn: "Rome", zone: "Europe/Rome" },
+      { nameEs: "Tokio", nameEn: "Tokyo", zone: "Asia/Tokyo" },
+      { nameEs: "Seúl", nameEn: "Seoul", zone: "Asia/Seoul" },
+      { nameEs: "Sídney", nameEn: "Sydney", zone: "Australia/Sydney" },
+      { nameEs: "Dubai", nameEn: "Dubai", zone: "Asia/Dubai" },
+      { nameEs: "Delhi", nameEn: "Delhi", zone: "Asia/Kolkata" },
+      { nameEs: "Moscú", nameEn: "Moscow", zone: "Europe/Moscow" },
+      { nameEs: "Johannesburgo", nameEn: "Johannesburg", zone: "Africa/Johannesburg" }
+    ];
 
     const langSelect = document.getElementById("language-select");
-    const originCitySelect = document.getElementById("origin-city");
-    const destinationCitySelect = document.getElementById("destination-city");
+    const originSelect = document.getElementById("origin-city");
+    const destinationSelect = document.getElementById("destination-city");
     const inputTime = document.getElementById("input-time");
-    const convertBtn = document.getElementById("convert-btn");
 
     function populateCities(lang) {
-      const cities = [...translations[lang].cities];
-      cities.sort((a, b) => a.offset - b.offset);
-      originCitySelect.innerHTML = "";
-      destinationCitySelect.innerHTML = "";
-      cities.forEach(city => {
-        const text = `${city.name} (UTC${city.offset >= 0 ? "+" : ""}${city.offset})`;
-        originCitySelect.add(new Option(text, city.offset));
-        destinationCitySelect.add(new Option(text, city.offset));
+      originSelect.innerHTML = "";
+      destinationSelect.innerHTML = "";
+      cityZones.forEach(city => {
+        const label = lang === "es" ? city.nameEs : city.nameEn;
+        originSelect.add(new Option(label, city.zone));
+        destinationSelect.add(new Option(label, city.zone));
       });
-      originCitySelect.selectedIndex = 0;
-      destinationCitySelect.selectedIndex = 1;
-    }
-
-    function updateTexts(lang) {
-      const t = translations[lang];
-      document.getElementById("main-title").textContent = t.mainTitle;
-      document.getElementById("subtitle").textContent = t.subtitle;
-      document.getElementById("label-origin").textContent = t.originCity;
-      document.getElementById("label-time").textContent = t.timeLabel;
-      document.getElementById("label-destination").textContent = t.destinationCity;
-      convertBtn.textContent = t.convertButton;
-    }
-
-    function pad(num) {
-      return num.toString().padStart(2, "0");
+      originSelect.selectedIndex = 0;
+      destinationSelect.selectedIndex = 1;
     }
 
     function convertTime() {
       const lang = langSelect.value;
-      const t = translations[lang];
-      const originOffset = parseFloat(originCitySelect.value);
-      const destOffset = parseFloat(destinationCitySelect.value);
-      const originCityName = originCitySelect.options[originCitySelect.selectedIndex].text.split(" (")[0];
-      const destCityName = destinationCitySelect.options[destinationCitySelect.selectedIndex].text.split(" (")[0];
+      const originZone = originSelect.value;
+      const destZone = destinationSelect.value;
 
-      document.getElementById("label-origin-clock").textContent = originCityName;
-      document.getElementById("label-destination-clock").textContent = destCityName;
+      const [h, m] = inputTime.value.split(":").map(Number);
+      const now = new Date();
+      now.setHours(h, m, 0, 0);
 
-      const [hours, minutes] = inputTime.value.split(":").map(Number);
+      const originLabel = originSelect.options[originSelect.selectedIndex].text;
+      const destLabel = destinationSelect.options[destinationSelect.selectedIndex].text;
 
-      document.getElementById("origin-clock").textContent = `${pad(hours)}:${pad(minutes)}`;
-      document.getElementById("origin-day").textContent = t.sameDay;
+      document.getElementById("label-origin-clock").textContent = originLabel;
+      document.getElementById("label-destination-clock").textContent = destLabel;
 
-      let totalMinutes = hours * 60 + minutes + (destOffset - originOffset) * 60;
-      let dayShift = 0;
+      const originTime = new Date(now.toLocaleString("en-US", { timeZone: originZone }));
+      const destTime = new Date(now.toLocaleString("en-US", { timeZone: destZone }));
 
-      if (totalMinutes < 0) {
-        totalMinutes += 1440;
-        dayShift = -1;
-      } else if (totalMinutes >= 1440) {
-        totalMinutes -= 1440;
-        dayShift = 1;
-      }
+      const diffDays = (destTime.getDate() - originTime.getDate());
+      const dayText = lang === "es"
+        ? (diffDays === 0 ? "Mismo día" : diffDays > 0 ? "Día siguiente" : "Día anterior")
+        : (diffDays === 0 ? "Same day" : diffDays > 0 ? "Next day" : "Previous day");
 
-      const destHours = Math.floor(totalMinutes / 60);
-      const destMinutes = Math.round(totalMinutes % 60);
-
-      document.getElementById("destination-clock").textContent = `${pad(destHours)}:${pad(destMinutes)}`;
-
-      if (dayShift === 0) {
-        document.getElementById("destination-day").textContent = t.sameDay;
-      } else if (dayShift === 1) {
-        document.getElementById("destination-day").textContent = t.nextDay;
-      } else {
-        document.getElementById("destination-day").textContent = t.prevDay;
-      }
+      const pad = n => n.toString().padStart(2, "0");
+      document.getElementById("origin-clock").textContent = `${pad(originTime.getHours())}:${pad(originTime.getMinutes())}`;
+      document.getElementById("destination-clock").textContent = `${pad(destTime.getHours())}:${pad(destTime.getMinutes())}`;
+      document.getElementById("origin-day").textContent = lang === "es" ? "Mismo día" : "Same day";
+      document.getElementById("destination-day").textContent = dayText;
     }
 
     langSelect.addEventListener("change", () => {
-      const lang = langSelect.value;
-      updateTexts(lang);
-      populateCities(lang);
+      populateCities(langSelect.value);
       convertTime();
     });
 
-    originCitySelect.addEventListener("change", convertTime);
-    destinationCitySelect.addEventListener("change", convertTime);
-    convertBtn.addEventListener("click", convertTime);
+    document.getElementById("convert-btn").addEventListener("click", convertTime);
 
-    const defaultLang = "es";
-    updateTexts(defaultLang);
-    populateCities(defaultLang);
+    populateCities("es");
     convertTime();
   </script>
 </body>
