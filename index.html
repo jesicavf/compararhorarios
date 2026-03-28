@@ -1,220 +1,244 @@
-<!-- Guarda esto como index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Comparador de Horarios Automático</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 2rem;
-      color: #333;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .autor {
-      font-size: 0.9rem;
-      font-style: italic;
-      color: #555;
-    }
-    select, input, button {
-      font-size: 1rem;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      width: 100%;
-      max-width: 300px;
-      box-sizing: border-box;
-    }
-    h1 {
-      margin-bottom: 0.2rem;
-      text-align: center;
-    }
-    h2 {
-      text-align: center;
-      font-weight: normal;
-      color: #666;
-      margin-top: 0;
-      margin-bottom: 2rem;
-    }
-    .container {
-      max-width: 360px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    button {
-      background-color: #007acc;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #005fa3;
-    }
-    .clocks {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 2rem;
-      gap: 1rem;
-    }
-    .clock {
-      background: white;
-      padding: 0.8rem;
-      border-radius: 8px;
-      width: 130px;
-      text-align: center;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      flex: 1 1 120px;
-    }
-    .clock h3 {
-      margin-bottom: 0.5rem;
-      font-weight: normal;
-      color: #007acc;
-      font-size: 0.95rem;
-    }
-    .time-display {
-      font-size: 1.8rem;
-      font-weight: bold;
-      font-family: monospace;
-    }
-    .day-info {
-      font-size: 0.8rem;
-      color: #777;
-      margin-top: 0.3rem;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Comparador de Horarios</title>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  background: #eef2f7;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #333;
+}
+
+header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.flags {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.flag {
+  cursor: pointer;
+  font-size: 1.5rem;
+  border: none;
+  background: none;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #007acc;
+}
+
+.container {
+  max-width: 350px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+select, input {
+  font-size: 0.95rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.clocks {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.clock {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 130px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: background 0.5s;
+}
+
+.city-name {
+  font-weight: bold;
+  color: #007acc;
+  margin-bottom: 0.3rem;
+}
+
+.utc {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.time {
+  font-size: 1.6rem;
+  font-family: monospace;
+  margin-bottom: 0.3rem;
+}
+
+.day-label {
+  font-size: 0.85rem;
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.day-same { background-color: #777; }
+.day-next { background-color: #4caf50; }
+.day-prev { background-color: #ff9800; }
+
+footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #555;
+  padding-top: 1rem;
+}
+</style>
 </head>
 <body>
-  <header>
-    <div class="autor">Autoría: Jésica Favara</div>
-    <div>
-      <label for="language-select" style="margin-right: 0.5rem;">🌐</label>
-      <select id="language-select" aria-label="Seleccionar idioma">
-        <option value="es" selected>Español</option>
-        <option value="en">English</option>
-      </select>
-    </div>
-  </header>
 
-  <h1 id="main-title">Comparador de Horarios</h1>
-  <h2 id="subtitle">Usá el conversor para revisar el horario de tu ciudad</h2>
+<header>
+  <div class="flags">
+    <button class="flag" data-lang="es">🇦🇷</button>
+    <button class="flag" data-lang="en">🇺🇸</button>
+  </div>
+</header>
 
-  <div class="container">
-    <label id="label-origin" for="origin-city">Ciudad de origen:</label>
-    <select id="origin-city"></select>
+<h2>Comparador de Horarios</h2>
 
-    <label id="label-time" for="input-time">Hora en ciudad de origen:</label>
-    <input type="time" id="input-time" value="12:00" />
+<div class="container">
+  <select id="origin"></select>
+  <input type="time" id="time" placeholder="Hora local"/>
+  <select id="destination"></select>
+</div>
 
-    <label id="label-destination" for="destination-city">Ciudad destino:</label>
-    <select id="destination-city"></select>
-
-    <button id="convert-btn">Convertir</button>
+<div class="clocks">
+  <div class="clock" id="originClock">
+    <div id="originLabel" class="city-name"></div>
+    <div id="originUTC" class="utc"></div>
+    <div id="originTime" class="time"></div>
+    <div id="originDay" class="day-label day-same"></div>
   </div>
 
-  <div class="clocks">
-    <div class="clock">
-      <h3 id="label-origin-clock">Ciudad de origen</h3>
-      <div id="origin-clock" class="time-display">--:--</div>
-      <div id="origin-day" class="day-info"></div>
-    </div>
-    <div class="clock">
-      <h3 id="label-destination-clock">Ciudad destino</h3>
-      <div id="destination-clock" class="time-display">--:--</div>
-      <div id="destination-day" class="day-info"></div>
-    </div>
+  <div class="clock" id="destClock">
+    <div id="destLabel" class="city-name"></div>
+    <div id="destUTC" class="utc"></div>
+    <div id="destTime" class="time"></div>
+    <div id="destDay" class="day-label day-same"></div>
   </div>
+</div>
 
-  <script>
-    const cityZones = [
-      { nameEs: "Buenos Aires", nameEn: "Buenos Aires", zone: "America/Argentina/Buenos_Aires" },
-      { nameEs: "Nueva York", nameEn: "New York", zone: "America/New_York" },
-      { nameEs: "Miami", nameEn: "Miami", zone: "America/New_York" },
-      { nameEs: "Los Ángeles", nameEn: "Los Angeles", zone: "America/Los_Angeles" },
-      { nameEs: "San Francisco", nameEn: "San Francisco", zone: "America/Los_Angeles" },
-      { nameEs: "Chicago", nameEn: "Chicago", zone: "America/Chicago" },
-      { nameEs: "Ciudad de México", nameEn: "Mexico City", zone: "America/Mexico_City" },
-      { nameEs: "Toronto", nameEn: "Toronto", zone: "America/Toronto" },
-      { nameEs: "Madrid", nameEn: "Madrid", zone: "Europe/Madrid" },
-      { nameEs: "Londres", nameEn: "London", zone: "Europe/London" },
-      { nameEs: "París", nameEn: "Paris", zone: "Europe/Paris" },
-      { nameEs: "Roma", nameEn: "Rome", zone: "Europe/Rome" },
-      { nameEs: "Tokio", nameEn: "Tokyo", zone: "Asia/Tokyo" },
-      { nameEs: "Seúl", nameEn: "Seoul", zone: "Asia/Seoul" },
-      { nameEs: "Sídney", nameEn: "Sydney", zone: "Australia/Sydney" },
-      { nameEs: "Dubai", nameEn: "Dubai", zone: "Asia/Dubai" },
-      { nameEs: "Delhi", nameEn: "Delhi", zone: "Asia/Kolkata" },
-      { nameEs: "Moscú", nameEn: "Moscow", zone: "Europe/Moscow" },
-      { nameEs: "Johannesburgo", nameEn: "Johannesburg", zone: "Africa/Johannesburg" }
-    ];
+<footer>Autoría: Jésica Favara</footer>
 
-    const langSelect = document.getElementById("language-select");
-    const originSelect = document.getElementById("origin-city");
-    const destinationSelect = document.getElementById("destination-city");
-    const inputTime = document.getElementById("input-time");
+<script>
+const cities = [
+  { es:"Buenos Aires", en:"Buenos Aires", tz:"America/Argentina/Buenos_Aires", utc:"UTC-3" },
+  { es:"Nueva York", en:"New York", tz:"America/New_York", utc:"UTC-4/UTC-5" },
+  { es:"Los Ángeles", en:"Los Angeles", tz:"America/Los_Angeles", utc:"UTC-7/UTC-8" },
+  { es:"Madrid", en:"Madrid", tz:"Europe/Madrid", utc:"UTC+1/UTC+2" },
+  { es:"Londres", en:"London", tz:"Europe/London", utc:"UTC+0/UTC+1" },
+  { es:"París", en:"Paris", tz:"Europe/Paris", utc:"UTC+1/UTC+2" },
+  { es:"Roma", en:"Rome", tz:"Europe/Rome", utc:"UTC+1/UTC+2" },
+  { es:"Berlín", en:"Berlin", tz:"Europe/Berlin", utc:"UTC+1/UTC+2" },
+  { es:"Tokio", en:"Tokyo", tz:"Asia/Tokyo", utc:"UTC+9" },
+  { es:"Seúl", en:"Seoul", tz:"Asia/Seoul", utc:"UTC+9" },
+  { es:"Pekín", en:"Beijing", tz:"Asia/Shanghai", utc:"UTC+8" },
+  { es:"Sídney", en:"Sydney", tz:"Australia/Sydney", utc:"UTC+10/UTC+11" },
+  { es:"Dubai", en:"Dubai", tz:"Asia/Dubai", utc:"UTC+4" },
+  { es:"Delhi", en:"Delhi", tz:"Asia/Kolkata", utc:"UTC+5:30" },
+  { es:"Ciudad de México", en:"Mexico City", tz:"America/Mexico_City", utc:"UTC-5/UTC-6" },
+  { es:"Santiago", en:"Santiago", tz:"America/Santiago", utc:"UTC-3/UTC-4" }
+];
 
-    function populateCities(lang) {
-      originSelect.innerHTML = "";
-      destinationSelect.innerHTML = "";
-      cityZones.forEach(city => {
-        const label = lang === "es" ? city.nameEs : city.nameEn;
-        originSelect.add(new Option(label, city.zone));
-        destinationSelect.add(new Option(label, city.zone));
-      });
-      originSelect.selectedIndex = 0;
-      destinationSelect.selectedIndex = 1;
-    }
+const el=id=>document.getElementById(id);
+const state={lang:"es"};
 
-    function convertTime() {
-      const lang = langSelect.value;
-      const originZone = originSelect.value;
-      const destZone = destinationSelect.value;
+function format(date,tz){
+  return new Intl.DateTimeFormat("en-GB",{hour:"2-digit",minute:"2-digit",hour12:false,timeZone:tz}).format(date);
+}
 
-      const [h, m] = inputTime.value.split(":").map(Number);
-      const now = new Date();
-      now.setHours(h, m, 0, 0);
+function dayDiff(date,tzA,tzB){
+  const a=new Date(date.toLocaleString("en-US",{timeZone:tzA}));
+  const b=new Date(date.toLocaleString("en-US",{timeZone:tzB}));
+  return (Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000;
+}
 
-      const originLabel = originSelect.options[originSelect.selectedIndex].text;
-      const destLabel = destinationSelect.options[destinationSelect.selectedIndex].text;
+function populate(){
+  const o=el("origin"),d=el("destination");
+  o.innerHTML=d.innerHTML="";
+  cities.forEach(c=>{
+    const name=c[state.lang];
+    o.add(new Option(`${name} (${c.utc})`,c.tz));
+    d.add(new Option(`${name} (${c.utc})`,c.tz));
+  });
+  d.selectedIndex=1;
+}
 
-      document.getElementById("label-origin-clock").textContent = originLabel;
-      document.getElementById("label-destination-clock").textContent = destLabel;
+function convert(){
+  const tzA=el("origin").value, tzB=el("destination").value;
+  const cityA=cities.find(c=>c.tz===tzA), cityB=cities.find(c=>c.tz===tzB);
 
-      const originTime = new Date(now.toLocaleString("en-US", { timeZone: originZone }));
-      const destTime = new Date(now.toLocaleString("en-US", { timeZone: destZone }));
+  const timeVal=el("time").value;
+  let now=new Date();
+  if(timeVal){
+    const [h,m]=timeVal.split(":").map(Number);
+    now.setHours(h,m,0,0);
+  }
 
-      const diffDays = (destTime.getDate() - originTime.getDate());
-      const dayText = lang === "es"
-        ? (diffDays === 0 ? "Mismo día" : diffDays > 0 ? "Día siguiente" : "Día anterior")
-        : (diffDays === 0 ? "Same day" : diffDays > 0 ? "Next day" : "Previous day");
+  const originTime=new Date(now.toLocaleString("en-US",{timeZone:tzA}));
+  const destTime=new Date(now.toLocaleString("en-US",{timeZone:tzB}));
 
-      const pad = n => n.toString().padStart(2, "0");
-      document.getElementById("origin-clock").textContent = `${pad(originTime.getHours())}:${pad(originTime.getMinutes())}`;
-      document.getElementById("destination-clock").textContent = `${pad(destTime.getHours())}:${pad(destTime.getMinutes())}`;
-      document.getElementById("origin-day").textContent = lang === "es" ? "Mismo día" : "Same day";
-      document.getElementById("destination-day").textContent = dayText;
-    }
+  el("originLabel").textContent=cityA[state.lang];
+  el("destLabel").textContent=cityB[state.lang];
+  el("originUTC").textContent=cityA.utc;
+  el("destUTC").textContent=cityB.utc;
+  el("originTime").textContent=format(originTime,tzA);
+  el("destTime").textContent=format(destTime,tzB);
 
-    langSelect.addEventListener("change", () => {
-      populateCities(langSelect.value);
-      convertTime();
-    });
+  // Colores de fondo según día/noche
+  const hOrigin=originTime.getHours();
+  const hDest=destTime.getHours();
+  el("originClock").style.background=(hOrigin>=6 && hOrigin<18)?"#d4edff":"#2a3b4d";
+  el("destClock").style.background=(hDest>=6 && hDest<18)?"#d4edff":"#2a3b4d";
+  el("originTime").style.color=(hOrigin>=6 && hOrigin<18)?"#000":"#fff";
+  el("destTime").style.color=(hDest>=6 && hDest<18)?"#000":"#fff";
 
-    document.getElementById("convert-btn").addEventListener("click", convertTime);
+  const diff=dayDiff(originTime,tzA,tzB);
+  const mapClass={"-1":"day-prev","0":"day-same","1":"day-next"};
+  const mapText={es:["Día anterior","Mismo día","Día siguiente"],en:["Previous day","Same day","Next day"]};
+  el("originDay").textContent=mapText[state.lang][1]; el("originDay").className="day-label day-same";
+  el("destDay").textContent=mapText[state.lang][diff+1]||""; el("destDay").className="day-label "+mapClass[diff]||"day-same";
+}
 
-    populateCities("es");
-    convertTime();
-  </script>
+// Eventos
+document.querySelectorAll(".flag").forEach(btn=>btn.addEventListener("click",()=>{
+  state.lang=btn.dataset.lang; populate(); convert();
+}));
+["origin","destination","time"].forEach(id=>el(id).addEventListener("change",convert));
+
+// Auto-update
+setInterval(convert,1000);
+
+// Inicializamos
+populate();
+convert();
+</script>
 </body>
 </html>
